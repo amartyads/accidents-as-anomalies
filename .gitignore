@@ -1,0 +1,9 @@
+*.csv
+*.geojson
+
+*.aux
+*.bbl
+*.log
+*.out
+*.blg
+*.synctex.gz

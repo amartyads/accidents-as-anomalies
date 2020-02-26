@@ -1,0 +1,152 @@
+\documentclass[a4paper, 12pt]{article}
+
+\usepackage{hyperref}
+\usepackage{graphicx}
+\graphicspath{ {./ }}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+ 
+\urlstyle{same}
+\begin{document}
+
+\title{Experiments on traffic data}
+
+\author{Amartya Das Sharma}
+\date{June 2019}
+\maketitle
+
+\section{Introduction}
+The data used is from the public Kaggle dataset \href{https://www.kaggle.com/daveianhickey/2000-16-traffic-flow-england-scotland-wales/version/10}{1.6 million UK traffic accidents} retrieved on 27th April. This report briefly explains the data components, the goal of the experiments done, the deep learning methods used and the reasons for their inclusion, and results of the experiments.
+\section{Data Contents}
+According to the Kaggle homepage, the dataset contains traffic data collected by the UK government over the period of 2005 - 2014 (excluding 2008). The datasets of interest are compiled summaries of police reports of traffic accidents over this time period. The information that the dataset contains for each report (i.e. the columns of the dataset) are the following:
+\begin{description}
+\item{\emph{Accident Index}} A unique ID given to the accident.
+\item{\emph{Easting and Northing}} Local British coordinates of the accident location.
+\item{\emph{Longitude and Latitude}} Global latitude and longitude of the accident location.
+\item{\emph{Police Force}} Denotes which police force attended the scene of the accident by unique ID. For example, 1 denotes metropolitan police, while 5 denotes the force at Merseyside. There are 51 unique codes for this field.
+\item{\emph{Accident Severity}} How severe the accident was. 1 stands for fatal accident, 2 for severe, 3 for slight.
+\item{\emph{Number of Vehicles}} Number of vehicles involved in the accident.
+\item{\emph{Number of Casualties}} Number of casualties in the accident.
+\item{\emph{Date}} Date the accident occurred in dd/mm/yyyy format.
+\item{\emph{Day of Week}} The day of the week. 1 stands for Sunday, 2 for Monday, until 7 for Saturday.
+\item{\emph{Time}} Time of the accident in 24h format.
+\item{\emph{Local Authority (District)}} Unique ID for the district. For example, 204 denotes Leeds, 350 denotes Boston. There are 416 unique codes for this field.
+\item{\emph{Local Authority (Highway)}} Unique ID for the highway authority. For example, E08000025 denotes Birmingham. There are 208 unique values in this filed.
+\item{\emph{1st Road Class, 1st Road Number, 2nd Road Class, 2nd Road Number}} Values used only for junctions, denoting class and number of connecting roads.
+\item{\emph{Road Type}} 7 possible road types shown by ID. For example, 1 denotes roundabouts, 3 denotes dual carriageway, 2 denotes a one way street. -1 denotes data out of range or missing.
+\item{\emph{Speed limit}} Speed limit of the accident zone.
+\item{\emph{Junction Detail}} Type of junction. 9 total unique IDs denote 9 types of junctions. For example, 0 denotes that there is no junction within 20 meters, 1 denotes a roundabout and 2 denotes mini roundabouts.
+\item{\emph{Junction Control}} How the junction is controlled. 5 total unique IDs denote 5 different control mechanisms. For example, 2 denotes auto traffic signal, 3 denotes stop sign. 
+\item{\emph{Pedestrian Crossing-Human Control}} Whether there is no pedestrian crossing within 50 meters (0), whether the crossing is controlled by school  crossing patrol(1) or by an authorized person (2).
+\item{\emph{Pedestrian Crossing-Physical Facilities}} 6 unique IDs denoting the type of crossing. 0 denotes absence of physical crossing facilities within 50 meters. 1 denotes zebra crossing, 7 denotes footbridge or subway.
+\item{\emph{Light Conditions}} The condition of lighting. Values include daylight, darkness with street lights on, darkness with street lights available but unlit, darkness with no street lights etc.
+\item{\emph{Weather Conditions}} Values include fair with/without high winds, rainy with/without high winds, snowing with/without high winds, fog or mist, or other.
+\item{\emph{Road Surface Conditions}} Values include dry, wet or damp, snow, frost or ice etc.
+\item{\emph{Special Conditions at Site}} Whether there were any abnormal conditions at site, such as road works underway, road surface defective etc.
+\item{\emph{Carriageway Hazards}} Hazards relating to the road, such as whether there are other objects, whether there was a previous accident wtc.
+\item{\emph{Urban or Rural Area}} In this field, 1 denotes an urban area, and 2 denotes rural.
+\item{\emph{Did Police Officer Attend Scene of Accident}} Field contains yes, no and no (self reported accident via form).
+\item{\emph{LSOA of Accident Location}} LSOA areas are geographic areas uniquely used by England and Wales for reporting smaller area statistics. This field gives the area of the accident.
+\item{\emph{Year}} The year of the accident.
+\end{description}
+\section{Experimental Setup}
+\paragraph{} For the following experiments, the data field of interest was chosen to be the \emph{Accident Severity} field. The goal was to see how other environmental factors affect the severity of an accident. However the dataset is very disbalanced, with 1,280,205 accidents recorded being slight accidents, 204,504 being severe accidents and only 19441 being fatal accidents. This means that traditional machine learning techniques have a lower chance of success due to overfitting.
+\paragraph{} Hence, machine learning techniques specific to anomaly detection were used in the following experiments, because they expect the anomaly class to have very few examples. The classes \textit{slight accidents} and \textit{severe accidents} were combined, and \textit{fatal accidents} were treated as outliers.  The techniques used were \emph{deep autoencoder networks}, \emph{one class SVMs} and \emph{generative adversarial networks (GANs)}. These methods are explained in their respective sections.
+\paragraph{} Irrelevant classes in the dataset were dropped and the remaining dataset was sorted, normalized and cleaned of null values. The resulting dataset had 828,817 rows, with 822,426 accidents being nonfatal and 6391 accidents being fatal.
+\section{Deep Autoencoders}
+\subsection{Introduction}In basic terms, an autoencoder is a neural network with as many output neurons as input neurons, with fewer hidden layer neurons than either layer. The output of an autoencoder is expected to be identical to the input, and it is trained to achieve such an effect. It can be thought of to comprise of two distinct halves, an encoder and a decoder. The encoder's job is to reduce the data to some representation with lower dimensionality, and the decoder reconstructs the original data from this representation.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\columnwidth]{"Autoencoderstructure".PNG}
+\caption{By Chervinskii - Own work, CC BY-SA 4.0, https://commons.wikimedia.org/w/index.php?curid=45555552}
+\end{figure}
+\paragraph{} If an autoencoder performs well, then it must mean that the code representing the data, while being compressed, captures the data accurately. Hence we can say that the network has learnt the data well. After training, the network becomes highly tuned to the data given, and while it can reconstruct data from the same class, it will not be able to reconstruct data from a different class, since it is not tuned to represent the relationships between data values of that class. This fact is used in anomaly detection, where anomalies have more reconstruction error (mean squared difference of prediction from actual data) than the members of the majority class.
+\subsection{Experiment details} The data was divided into training and testing sets, in an 80:20 split. The training data only contained information about nonfatal accidents, and the testing data contained instances of both fatal and nonfatal accidents. The understanding is that, if the network is trained exclusively on nonfatal accidents and is then made to reconstruct fatal accidents, it should make more errors doing so if fatal accidents are truly anomalous.
+\paragraph{} The autoencoder contains 9 layers, with architecture shown in Figure ~\ref{fig:autoarch} (the input layer with 21 neurons is not shown but exists before the first dense layer): 
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\columnwidth]{"autostruct".PNG}
+\caption{Structure of the autoencoder}
+\label{fig:autoarch}
+\end{figure}
+The autoencoder was trained for 200 epochs. The intention is to overfit the network on nonfatal accidents so that it cannot reconstruct fatal accidents (or reconstruct them with higher error than nonfatal accidents).
+\subsection{Results} 
+The model converged with a loss of $0.0092$ (mean squared error loss).
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\columnwidth]{"autoencloss".PNG}
+\caption{Training loss graph of the autoencoder}
+\end{figure}
+However, when the network was tested, it could reconstruct fatal accidents as well as it could reconstruct nonfatal accidents.
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.75\columnwidth]{"autoenc".PNG}
+\caption{Reconstruction of testing data}
+\end{figure}
+\paragraph{} The network had never seen fatal accidents before, but it could reconstruct the data despite that. Hence the representation that the network developed for nonfatal accidents works for fatal accidents too, despite overfitting. Therefore, fatal accidents, according to autoencoders, are not anomalies, based on only environmental data.
+\section{One-class SVM}
+\subsection{Introduction} 
+To use SVMs for anomaly detection, one-class SVMs are often used. Here, data from only one class is used, and an SVM boundary is fit around this data. The understanding is that members of other classes (anomalies) would fall outside this boundary.
+\subsection{Experiment details} A subset of the data was used for training. 700 fatal accidents and 40000 nonfatal accidents were randomly sampled and divided in an 80:20 split for training and testing. A radial basis function was used as kernel.
+\subsection{Results}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\columnwidth]{"ocsvmdistances".PNG}
+\caption{Result of the decision function on testing data}
+\label{fig:ocsvm}
+\end{figure}
+\paragraph{} As shown in Figure ~\ref{fig:ocsvm}, the one class SVM classifies most fatal accidents as nonfatal i.e. it does not treat them as anomalies.
+\section{Generative Adversarial Networks}
+\subsection{Introduction}
+Generative adversarial networks (GANs), while usually used to generate realistic example of given data, can also be used for anomaly detection.
+\paragraph{} GANs consist of two parts: a \textit{generator} and a \textit{discriminator}. The discriminator judges whether data belongs to a certain class or not, while the generator takes random noise as input and tries to generate data that can fool the discriminator. Both neural networks try and work against each other, improving both their performance over time.The discriminator learns to generalize the data better, and the generator learns how to make its generated data resemble actual data more and more.
+\paragraph{} In this experiment, the discriminator is used for anomaly detection. After thorough training with data (from nonfatal accidents) and random noise, the discriminator should classify fatal accidents as noise, more often that it would classify it as legitimate data (nonfatal accident data).
+\subsection{Experiment details}
+\paragraph{} Again, the data was split in an 80:20 ratio. Fatal accidents were removed from the training data and the residual data was used.
+\paragraph{} The architecture for the generative network can be seen in Figure ~\ref{fig:generator} and the architecture for the discriminator in Figure ~\ref{fig:discriminator}. The two are then combined into one network, shown in ~\ref{fig:gan}.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\columnwidth]{"generarch".PNG} 
+\caption{Generator network}
+\label{fig:generator}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\columnwidth]{"discrimarch".PNG}
+\caption{Discriminator network}
+\label{fig:discriminator}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\columnwidth]{"gancombine".PNG}
+\caption{Combined GAN network}
+\label{fig:gan}
+\end{figure}
+\paragraph{} Each row of data contains 21 data points. This data was converted to a 5x5 array, adding extra zeroes so that a square shape was obtained. This 5x5 array was treated as an image, and was fed to the discriminator (which uses convolutional neural networks) for pretraining.
+\paragraph{} After pretraining, the two networks are trained together. The generator takes 100 random bits, and converts them into a 5x5 image. The discriminator then classifies the 5x5 images as valid data or noise. This is done for 8000 epochs.
+\clearpage
+\subsection{Results}
+\paragraph{} The loss graph of the GAN is shown in Figure ~\ref{fig:ganloss}.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\columnwidth]{"ganloss".PNG}
+\caption{GAN network training loss}
+\label{fig:ganloss}
+\end{figure}
+\paragraph{} After training, the testing data is fed to the discriminator. The ROC graph is obtained and shown in Figure ~\ref{fig:ganroc}. For true anomaly detection, we expect to see a graph with TPR growing faster than FPR. However, we see an ROC curve characteristic of an untrained network making random guesses.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\columnwidth]{"ganroc".PNG}
+\caption{ROC curve of the discriminator}
+\label{fig:ganroc}
+\end{figure}
+\paragraph{} Again, we see that the model is unable to differentiate between fatal and nonfatal accidents, even though it was trained exclusively on nonfatal accidents. We can conclude that fatal accident conditions are closer to 
+\section{Conclusion}
+From the results, the conclusion that is drawn is that fatal and nonfatal accidents occur in similar environmental conditions, and there are no conditions (or combination of conditions) that cause exclusively fatal or nonfatal accidents. Intuitively, this makes sense, because the driver of the car is a much bigger factor in determining the severity of an accident, and better drivers drive better in all conditions. However, this work only looks at 3 approaches to verify this hypothesis, and further work is desirable to derive stronger conclusions.
+\end{document}

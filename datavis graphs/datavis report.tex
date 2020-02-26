@@ -1,0 +1,195 @@
+\documentclass[a4paper, 12pt]{article}
+
+\usepackage{hyperref}
+\usepackage{graphicx}
+\graphicspath{ {./ }}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+ 
+\urlstyle{same}
+\begin{document}
+
+\title{Visualizations of traffic data}
+
+\author{Amartya Das Sharma}
+\date{May 2019}
+\maketitle
+
+\section{Introduction}
+The data used is from the public Kaggle dataset \href{https://www.kaggle.com/daveianhickey/2000-16-traffic-flow-england-scotland-wales/version/10}{1.6 million UK traffic accidents} retrieved on 27th April. The following section explains the data layout, with the remaining sections containing graphs comparing values of interest in the data. Explanations and observations are also provided.
+\section{The data}
+According to the Kaggle homepage, the dataset contains traffic data collected by the UK government over the period of 2005 - 2014 (excluding 2008). The datasets of interest are compiled summaries of police reports of traffic accidents over this time period. The information that the dataset contains for each report (i.e. the columns of the dataset) are the following:
+\begin{description}
+\item{\emph{Accident Index}} A unique ID given to the accident.
+\item{\emph{Easting and Northing}} Local British coordinates of the accident location.
+\item{\emph{Longitude and Latitude}} Global latitude and longitude of the accident location.
+\item{\emph{Police Force}} Denotes which police force attended the scene of the accident by unique ID. For example, 1 denotes metropolitan police, while 5 denotes the force at Merseyside. There are 51 unique codes for this field.
+\item{\emph{Accident Severity}} How severe the accident was. 1 stands for fatal accident, 2 for severe, 3 for slight.
+\item{\emph{Number of Vehicles}} Number of vehicles involved in the accident.
+\item{\emph{Number of Casualties}} Number of casualties in the accident.
+\item{\emph{Date}} Date the accident occurred in dd/mm/yyyy format.
+\item{\emph{Day of Week}} The day of the week. 1 stands for Sunday, 2 for Monday, until 7 for Saturday.
+\item{\emph{Time}} Time of the accident in 24h format.
+\item{\emph{Local Authority (District)}} Unique ID for the district. For example, 204 denotes Leeds, 350 denotes Boston. There are 416 unique codes for this field.
+\item{\emph{Local Authority (Highway)}} Unique ID for the highway authority. For example, E08000025 denotes Birmingham. There are 208 unique values in this filed.
+\item{\emph{1st Road Class, 1st Road Number, 2nd Road Class, 2nd Road Number}} Values used only for junctions, denoting class and number of connecting roads.
+\item{\emph{Road Type}} 7 possible road types shown by ID. For example, 1 denotes roundabouts, 3 denotes dual carriageway, 2 denotes a one way street. -1 denotes data out of range or missing.
+\item{\emph{Speed limit}} Speed limit of the accident zone.
+\item{\emph{Junction Detail}} Type of junction. 9 total unique IDs denote 9 types of junctions. For example, 0 denotes that there is no junction within 20 meters, 1 denotes a roundabout and 2 denotes mini roundabouts.
+\item{\emph{Junction Control}} How the junction is controlled. 5 total unique IDs denote 5 different control mechanisms. For example, 2 denotes auto traffic signal, 3 denotes stop sign. 
+\item{\emph{Pedestrian Crossing-Human Control}} Whether there is no pedestrian crossing within 50 meters (0), whether the crossing is controlled by school  crossing patrol(1) or by an authorized person (2).
+\item{\emph{Pedestrian Crossing-Physical Facilities}} 6 unique IDs denoting the type of crossing. 0 denotes absence of physical crossing facilities within 50 meters. 1 denotes zebra crossing, 7 denotes footbridge or subway.
+\item{\emph{Light Conditions}} The condition of lighting. Values include daylight, darkness with street lights on, darkness with street lights available but unlit, darkness with no street lights etc.
+\item{\emph{Weather Conditions}} Values include fair with/without high winds, rainy with/without high winds, snowing with/without high winds, fog or mist, or other.
+\item{\emph{Road Surface Conditions}} Values include dry, wet or damp, snow, frost or ice etc.
+\item{\emph{Special Conditions at Site}} Whether there were any abnormal conditions at site, such as road works underway, road surface defective etc.
+\item{\emph{Carriageway Hazards}} Hazards relating to the road, such as whether there are other objects, whether there was a previous accident wtc.
+\item{\emph{Urban or Rural Area}} In this field, 1 denotes an urban area, and 2 denotes rural.
+\item{\emph{Did Police Officer Attend Scene of Accident}} Field contains yes, no and no (self reported accident via form).
+\item{\emph{LSOA of Accident Location}} LSOA areas are geographic areas uniquely used by England and Wales for reporting smaller area statistics. This field gives the area of the accident.
+\item{\emph{Year}} The year of the accident.
+\end{description}
+\section{Day of week}
+Here we have graphs comparing number of casualties per day.
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"01fatal_nocas_day".PNG}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"02severe_nocas_day".PNG}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"03slight_nocas_day".PNG}
+\end{figure}
+As shown there are more fatal casualties on the weekends, more slight casualties on the weekdays, more severe casualties on Friday and Saturday. A possible explanation could be that people are more likely to be driving rashly and under influence on weekends.
+\section{Lighting conditions}
+Here he have graphs comparing number of casualties based on the lighting conditions of the area.
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"04fatal_light".PNG}
+\end{figure}
+Most fatal casualties occurred in daylight on roads with streetlights (~59\%), followed by nighttime and no street lights (~20\%) and then nighttime and lit streetlights(~19\%). 
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"05severe_light".PNG}
+\end{figure}
+Most severe casualties again in daylight (~67\%), followed by streetlights being present and lit (~21\%) and then darkness without streetlights (~10\%).
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"06slight_light".PNG}
+\end{figure}
+~73\% of all slight accidents occur in daylight. Next biggest chunk is ~19\% for streetlights present and lit.
+\paragraph{} Most accidents consistently happen in the best lighting conditions, presumably because drivers are more careful when conditions are tougher to drive in. A lot of fatal accidents occur in darkness without streetlights, while severe and slight accidents occur in darkness with lights. It is presumable that accidents are more likely to be fatal when there are no streetlights.
+\section{Weather conditions}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"07fatal_weather".PNG}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"08severe_weather".PNG}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"09slight_weather".PNG}
+\end{figure}
+81.7\% of all fatal casualties occur in fine weather without high winds, followed by ~10\% in raining without high winds. Data is almost identical for severe and slight casualties.
+\paragraph{} Again, this could be because drivers are more careful in adverse conditions, causing less accidents.
+\section{Road condition}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"10fatal_road".PNG}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"11severe_road".PNG}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"12slight_road".PNG}
+\end{figure}
+~65\% of all fatal casualties occur on dry roads, and 32.5\% on wet/damp roads. Again, data is almost identical for severe (68.5\%, 29\%) and slight (67.8\%, 29\%) casualties.
+\paragraph{} Since road condition is dependent on weather, we can see that the data matches the weather condition data, leading us to the same belief that people are more careful in adverse conditions.
+\vfill
+\clearpage
+\section{Urban or Rural area}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"13fatal_urru".PNG}
+\end{figure}
+Of all fatal casualties, ~29.5\% were in urban areas, while ~70.5\% were in rural areas.
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"14severe_urru".PNG}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"15slight_urru".PNG}
+\end{figure}
+The statistics flip for severe and slight accidents. Severe casualties were almost identical (~52\% urban, ~48\% rural) and for slight casualties, urban (~63.5\%) had more than rural (~36.5\%).
+\paragraph{} Since the data we are dealing with is made up of reported incidents, it is entirely possible that only fatal and mostly severe incidents from rural areas even get reported, which can explain the flip in the statistics. However, it is also possible that more casualties in rural areas are fatal because of a lack of resources for treatment, or lack of crossings and driver awareness.
+\section{Monthly analysis}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"16fatal_month".PNG}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"17severe_month".PNG}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"18slight_month".PNG}
+\end{figure}
+Provides no significant insight, numbers consistent amongst months except for February.
+\vfill
+\clearpage
+\section{Hourly analysis}
+\subsection{Weekdays}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"19fatalwd_hour".PNG}
+\end{figure}
+Fatal casualty numbers go up gradually from 04:00 (285), peaking at 17:00 to 17:59 (1662), then tapering off.
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"20severewd_hour".PNG}
+\end{figure}
+Severe casualties follow a similar pattern but there is an abrupt spike at 08:00 to 08:59 (14021). Following this the number goes down to 8758 at 09:00, and increases gradually before rising abruptly from 15:00 to 17:59 (changing from 11798 to 16249 and above) before going back down.
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"21slightwd_hour".PNG}
+\end{figure}
+Slight casualties follow a similar pattern, with spikes at 08:00-08:59 and 15:00-17:59.
+\paragraph{} This obviously points to a rise in accidents around the start and end of office hours, when the traffic can be presumed to be at maximum.
+\subsection{Weekends}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"22fatalwn_hour".PNG}
+\end{figure}
+\paragraph{}
+Fatal casualities follow a smooth pattern, with spikes at 17:00-17:59 and 00:00-02:59. minimum values occur at 06:00 and 22:00.
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"23severewn_hour".PNG}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"24slightwn_hour".PNG}
+\end{figure}
+\paragraph{}
+Severe and slight casualty numbers follow almost identical trends.
+\paragraph{} Comparing with weekdays, we can see that the peak accident prone hours have shifted, implying that the peak traffic hours shift similarly, and people go out late and return late on weekends.
+\vfill
+\clearpage
+\section{Speed limits}
+Speed limits in the data vary from 10 to 70 mph.
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"25fatal_speed".PNG}
+\end{figure}
+Fatal casualties occur mostly at the higher speed limit areas (60 mph: ~43\%, 70 mph: ~15.2\%). ~27\% of fatal casualties occur at 30 mph speed limit areas.
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"26severe_speed".PNG}
+\end{figure}
+Most severe casualties occur in areas with speed limit 30 mph (~52.3\%), followed by 60 mph(~26\%).
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"27slight_speed".PNG}
+\end{figure}
+Similarly, most slight accidents occur in areas with speed limit 30 mph (~62.6\%), followed by 60 mph(~16\%).
+\paragraph{} This indicates that as speed limits increase, more incidents turn fatal.
+\section{Road type}
+\begin{figure}[!hb]
+\includegraphics[width=0.75\columnwidth]{"28fatal_roadt".PNG}
+\end{figure}
+~75.8\% of fatal casualties occurred on single carriageways, followed by ~21\% on dual carriageways.
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"29severe_roadt".PNG}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[width=0.75\columnwidth]{"30slight_roadt".PNG}
+\end{figure}
+Similar trends are seen for severe (~79\% single carriageway, ~14.6\% dual carriageway) and slight (~73\% single carriageway, ~16.3\% dual carriageway) casualties.
+\paragraph{} This could simply mean one-way roads are safer since there is no two way traffic, or it could mean that a proportionally large number of roads in the UK are single and dual carriageway roads.
+\end{document}
